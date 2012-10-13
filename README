@@ -1,0 +1,32 @@
+--[ (Complete) FM-Station
+
+----[ Overview
+
+	This implements the full FM-Stereo and RDS (including TMC) modulation in
+software. The only thing you need is a very basic FM-modulator (mono) attached
+to your soundcard. The card should be capable of at least 96kHz playback for
+fm-stereo or 192kHz if you also like RDS capabilities, 192kHz is strongly
+recommended for everything. In case you wonder what it actually does just
+see signal.png. To get a more robust RDS reception the RDS signal is a little
+stronger than local regulations allow but no impact on stereo quality was
+audible so far. Also remember to shield your modulator properly to get the
+best quality possible out of it.
+
+----[ Usage
+
+	See fmstation.sh script to get an idea. The program expects 192kHz stereo
+float samples on stdin and outputs 192kHz mono float samples on stdout. Make
+sure you set AUDIODEV to "hw:0,0" or whatever suits your system, without the
+soundcard won't do more than 48kHz or so. If something is wrong in your
+playback chain stereo will be detected by a receiver but won't be there
+and/or RDS won't work. 
+
+	To change stuff like RDS/TMC-information you have to change the source...
+...for now ;)
+
+----[ TODO
+
+	* transform quick hack into nice code ;)
+	* simpler RDS configuration
+	* ...
+
