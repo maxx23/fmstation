@@ -367,7 +367,7 @@ int main(int argc, char **argv) {
 	int    bpos = 0;
 	double symclk_p = 0.0;
 	char   symclk_b = 1;
-	int    n;
+	int    n, len;
 	unsigned long pos = 0;
 	struct rds_group_s *group;
 
@@ -385,6 +385,11 @@ int main(int argc, char **argv) {
 		double rds     = sin(clock * 3.0);
 		double symclk  = sin(clock / 16.0);
 
+		len = fread(&samp_s, 8, 1, stdin);
+		if(len != 1)
+			break;
+
+		
 		if(RISING_EDGE(symclk, symclk_p)) {
 			e     = DIFF_ENCODE(group->bits[bpos], e_p);
 			m     = MANCH_ENCODE(symclk_b, e);
@@ -396,10 +401,10 @@ int main(int argc, char **argv) {
 
 			if(!bpos) {
 				group = rds_group_schedule();
-				//fprintf(stderr, "%.4x %.4x %.4x %.4x\n",
-				//	group->A, group->B, group->C, group->D);
-				for(n = 0; n < RDS_GROUP_LEN; n++)
-					putc('0' + group->bits[n], stderr);
+				/* fprintf(stderr, "%.4x %.4x %.4x %.4x\n",
+					group->A, group->B, group->C, group->D); */
+				/* for(n = 0; n < RDS_GROUP_LEN; n++)
+					putc('0' + group->bits[n], stderr); */
 			}
 
 			if(pos > 34560000l)
@@ -410,8 +415,6 @@ int main(int argc, char **argv) {
 			symclk_b ^= 1;
 		}
 
-		fread(&samp_s, 8, 1, stdin);
-		
 		samp.l = PREEMP_IIR(samp_s.l, samp_sp.l, samp_p.l);
 		samp.r = PREEMP_IIR(samp_s.r, samp_sp.r, samp_p.r);
 		
@@ -428,7 +431,9 @@ int main(int argc, char **argv) {
 
 		out_f = (float)(out);
 		
-		fwrite(&out_f, 4, 1, stdout);
+		len = fwrite(&out_f, 4, 1, stdout);
+		if(len != 1)
+			break;
 
 		symclk_p  = symclk;
 		mono_p    = mono;
@@ -441,5 +446,7 @@ int main(int argc, char **argv) {
 
 		pos++;
 	}
+
+	return 1;
 }
 
